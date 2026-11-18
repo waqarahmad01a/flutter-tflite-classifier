@@ -1,0 +1,31 @@
+allprojects {
+    repositories {
+        google()
+        mavenCentral()
+    }
+}
+
+rootProject.buildDir = "../build"
+subprojects {
+    project.buildDir = "${rootProject.buildDir}/${project.name}"
+}
+subprojects {
+    project.evaluationDependsOn(":app")
+}
+
+tasks.register("clean", Delete) {
+    delete rootProject.buildDir
+}
+
+// Match TensorFlow Lite's Kotlin bytecode target to its Java 11 target.
+subprojects {
+    if (project.name == "tflite_flutter") {
+        tasks.configureEach {
+            if (name.startsWith("compile") && name.endsWith("Kotlin")) {
+                kotlinOptions {
+                    jvmTarget = "11"
+                }
+            }
+        }
+    }
+}
